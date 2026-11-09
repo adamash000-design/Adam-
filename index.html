@@ -1,10 +1,4 @@
-<!doctype html>
-<html lang="he" dir="rtl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<style>*,*::before,*::after{box-sizing:border-box}html,body{margin:0}</style>
-<title>מילים להכתבה</title>
+<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>*,*::before,*::after{box-sizing:border-box}html,body{margin:0}</style><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="מילים"><meta name="theme-color" content="#fbf9f1"><title>מילים להכתבה</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;800&family=Patrick+Hand&family=Secular+One&display=swap" rel="stylesheet">
@@ -305,10 +299,19 @@
   .task.bonus textarea { background: #fffdf2; color: #1a1300; border-color: #c98a00; }
   .task .ribbon { position: absolute; top: -13px; inset-inline-end: 14px; background: #c98a00; color: #fff; font-weight: 800; font-size: 14px; padding: 2px 12px; border-radius: 12px; letter-spacing: .5px; }
 
+
+  .install { background: var(--card); border: 2px solid var(--ink); border-radius: 6px; box-shadow: 0 4px 0 var(--ink); padding: 4px 16px 16px; margin: 6px 0 22px; }
+  .install h2 { margin-top: 14px; }
+  .install .note { background: var(--hi); color: var(--hi-ink); border: 2px dashed var(--ink); border-radius: 4px; padding: 8px 10px; font-weight: 600; margin: 8px 0 12px; }
+  .how { border-top: 1px dashed var(--rule); padding: 6px 0; }
+  .how summary { cursor: pointer; font-weight: 800; min-height: 44px; display: flex; align-items: center; gap: 6px; }
+  .how summary small { font-weight: 600; color: var(--ink-soft); }
+  .steps { list-style: none; counter-reset: st; margin: 4px 0 8px; padding: 0; display: grid; gap: 10px; }
+  .steps li { counter-increment: st; display: flex; gap: 10px; align-items: flex-start; line-height: 1.4; }
+  .steps li::before { content: counter(st); flex: none; width: 30px; height: 30px; display: grid; place-items: center; background: var(--hi); color: var(--hi-ink); border: 2px solid var(--ink); border-radius: 50%; font-family: var(--hand); font-size: 20px; line-height: 1; }
+
   @media (prefers-reduced-motion: reduce) { .shake { animation: none; } .bar > span { transition: none; } .spin { animation: none; } }
-</style>
-</head>
-<body>
+</style></head><body>
 
 <div class="wrap">
   <header class="top">
@@ -806,6 +809,7 @@
     view(
       '<section class="set"><button type="button" class="link" id="setBack">חזרה</button>' +
       '<h2>הגדרות</h2>' +
+      installSection() +
       '<h2 style="margin-top:8px">עיצוב</h2><p class="sub">בחר מראה. הבחירה נשמרת במכשיר הזה.</p>' +
       '<div class="skins" role="radiogroup" aria-label="עיצוב">' + skins + '</div>' +
       libSec +
@@ -823,6 +827,7 @@
     );
     var back = function () { settings(); };
     document.getElementById('setBack').addEventListener('click', backHome);
+    bindInstall();
     var radios = [].slice.call(stage.querySelectorAll('.skin'));
     radios.forEach(function (b) {
       b.addEventListener('click', function () {
@@ -849,6 +854,63 @@
       arm(document.getElementById('delDict'), 'לחץ שוב למחיקה', function () {
         if (store.dict && store.dict.src === 'lib') delete store.byId[store.dict.id];
         store.dict = null; store.mastery = {}; save(); welcome();
+      });
+    }
+  }
+
+  /* ---------- Add to home screen + share the link ---------- */
+  var ARTIFACT_URL = 'https://claude.ai/artifact/3WBBcQXbwVXpqr5AdievaH';
+  var deferredInstall = null;
+  window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferredInstall = e; });
+  function platform() {
+    var ua = navigator.userAgent || '';
+    if (/iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) return 'ios';
+    return /Android/i.test(ua) ? 'android' : 'desktop';
+  }
+  function isFramed() { try { return window.self !== window.top; } catch (e) { return true; } }
+  function siteUrl() { return isFramed() ? ARTIFACT_URL : String(location.href).split('#')[0]; }
+  function installSection() {
+    var pf = platform();
+    var HOW = [
+      { id: 'ios', name: 'אייפון ואייפד', steps: ['פתחו את האתר ב-Safari, לא מתוך אפליקציה אחרת.', 'לחצו על כפתור השיתוף: ריבוע עם חץ שמצביע למעלה.', 'גללו למטה ובחרו "הוסף למסך הבית".', 'לחצו "הוסף" בפינה. הסמל יופיע על מסך הבית.'] },
+      { id: 'android', name: 'אנדרואיד', steps: ['פתחו את האתר ב-Chrome.', 'לחצו על שלוש הנקודות ⋮ בפינה העליונה.', 'בחרו "התקנת אפליקציה" או "הוספה למסך הבית".', 'אשרו. הסמל יופיע על מסך הבית. ב-Samsung Internet: תפריט, "הוסף דף אל", "מסך הבית".'] },
+      { id: 'desktop', name: 'מחשב', steps: ['ב-Chrome או Edge: לחצו על סמל ההתקנה בקצה שורת הכתובת, מסך קטן עם חץ.', 'אם אין סמל: תפריט ⋮, "שמירה והעברה", "התקנת דף כאפליקציה". ב-Edge: תפריט, "אפליקציות", "התקן אתר זה כאפליקציה".', 'ב-Safari במק: תפריט "קובץ", "הוסף ל-Dock".', 'בכל דפדפן אפשר גם ללחוץ Ctrl+D (במק ⌘+D) כדי לשמור במועדפים.'] }
+    ];
+    var blocks = HOW.map(function (h) {
+      return '<details class="how"' + (h.id === pf ? ' open' : '') + '><summary>' + esc(h.name) + (h.id === pf ? ' <small>(המכשיר הזה)</small>' : '') + '</summary><ol class="steps">' +
+        h.steps.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ol></details>';
+    }).join('');
+    return '<div class="install"><h2>הוסף למסך הבית</h2>' +
+      '<p class="sub">ככה האפליקציה נמצאת על המסך כמו אפליקציה רגילה, בלי לחפש את הקישור.</p>' +
+      (isFramed() ? '<p class="note">עכשיו האתר פתוח בתוך Claude. כדי להוסיף אותו למסך הבית, פתחו את הקישור בדפדפן (Safari או Chrome) ואז בצעו את הצעדים.</p>' : '') +
+      '<div class="stack"><button type="button" class="btn primary" id="shareLink">שלח את הקישור לחבר או לחברה</button>' +
+      '<button type="button" class="btn" id="instNow" hidden>התקן עכשיו</button></div>' +
+      '<div class="msg" id="shareMsg" role="status"></div><div id="linkHost"></div>' + blocks +
+      '<p class="sub">חשוב: הנקודות נשמרות בנפרד לכל מקום שבו פותחים את האתר. כדאי להוסיף למסך הבית לפני שמתחילים לצבור נקודות.</p></div>';
+  }
+  function bindInstall() {
+    var sb = document.getElementById('shareLink'), msg = document.getElementById('shareMsg'), host = document.getElementById('linkHost'), inst = document.getElementById('instNow');
+    if (!sb) return;
+    function say(t, c) { msg.className = 'msg ' + (c || ''); msg.textContent = t; }
+    function manual(url) {
+      host.innerHTML = '<label class="field" for="linkBox"><span>סמנו והעתיקו את הקישור</span></label><input class="fi" id="linkBox" type="text" readonly dir="ltr">';
+      var box = document.getElementById('linkBox'); box.value = url; box.focus(); box.select(); say('העתיקו את הקישור ושלחו אותו.', '');
+    }
+    function copy(url) {
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(function () { host.innerHTML = ''; say('הקישור הועתק. אפשר להדביק בהודעה.', 'ok'); }, function () { manual(url); });
+      else manual(url);
+    }
+    sb.addEventListener('click', function () {
+      var url = siteUrl();
+      if (navigator.share) {
+        navigator.share({ title: 'מילים להכתבה', text: 'אפליקציה לתרגול הכתבות באנגלית', url: url }).catch(function (e) { if (!e || e.name !== 'AbortError') copy(url); });
+      } else copy(url);
+    });
+    if (deferredInstall && !isFramed()) {
+      inst.hidden = false;
+      inst.addEventListener('click', function () {
+        deferredInstall.prompt();
+        deferredInstall.userChoice.then(function () { deferredInstall = null; inst.hidden = true; }, function () {});
       });
     }
   }
@@ -1664,6 +1726,4 @@
   backHome();
 })();
 </script>
-
-</body>
-</html>
+</body></html>
