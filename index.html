@@ -1529,6 +1529,28 @@
     });
   }
 
+  /* ---------- Varied hints: never the whole answer ---------- */
+  function hintMaker(text, isEn) {
+    var base = String(text || '').replace(/\([^)]*\)/g, '').split(/\s*[\/,;]\s*/)[0].trim();
+    var words = base.split(/\s+/).filter(Boolean), chars = words.join('').split(''), len = chars.length;
+    var kinds = ['first', 'count'];
+    if (len >= 3) kinds.push('last');
+    if (len >= 4) kinds.push('pattern', 'second');
+    if (words.length > 1) kinds.push('words');
+    var n = Math.floor(Math.random() * kinds.length);
+    function show(v) { return isEn ? en(v) : esc(v); }
+    return function () {
+      var k = kinds[n++ % kinds.length], out;
+      if (k === 'first') out = 'האות הראשונה: ' + show(chars[0]);
+      else if (k === 'count') out = 'מספר האותיות: ' + len;
+      else if (k === 'last') out = 'האות האחרונה: ' + show(chars[len - 1]);
+      else if (k === 'second') out = 'האות השנייה: ' + show(chars[1]);
+      else if (k === 'words') out = 'מספר המילים: ' + words.length + ', הראשונה מתחילה ב-' + show(words[0].charAt(0));
+      else out = 'התבנית: ' + show(words.map(function (wd) { return wd.split('').map(function (c, i) { return (i === 0 || i % 3 === 2) ? c : '_'; }).join(' '); }).join('  ·  '));
+      return out;
+    };
+  }
+
   /* ---------- 4. Build the word ---------- */
   function spell() {
     var list = shuffle(pool()).slice(0, 8), i = 0, right = 0;
@@ -1537,7 +1559,7 @@
       var sM = sm(), w = list[i], target = w.en, letters = sM ? target.trim().split(/\s+/) : target.replace(/ /g, '').split(''), tries = 0, locked = false;
       var tiles = shuffle(letters.map(function (ch, k) { return { ch: ch, id: k }; }));
       if (letters.length > 1 && tiles.map(function (t) { return t.ch; }).join(sM ? ' ' : '') === letters.join(sM ? ' ' : '')) tiles.push(tiles.shift());
-      var filled = [];
+      var filled = [], mkHint = hintMaker(target, true);
       view(
         '<section class="panel"><div class="meta"><span>מילה ' + (i + 1) + ' מתוך ' + list.length + '</span></div>' + bar(i, list.length) +
         '<div class="qbox"><div class="small">' + (sM ? 'סדר את המילים למשפט. התרגום:' : 'סדר את האותיות. התרגום:') + '</div><span class="he">' + esc(w.he) + '</span></div>' +
@@ -1587,7 +1609,7 @@
       }
       document.getElementById('undo').addEventListener('click', function () { if (!locked) { filled.pop(); render(); } });
       document.getElementById('hint').addEventListener('click', function () {
-        fb.className = 'fb'; fb.innerHTML = sM ? 'המשפט מתחיל במילה ' + en(letters[0]) + ' ויש בו ' + letters.length + ' מילים' : 'מתחילה באות ' + en(letters[0]) + ' ויש בה ' + letters.length + ' אותיות';
+        fb.className = 'fb'; fb.innerHTML = mkHint();
       });
       render();
     }
@@ -1610,7 +1632,7 @@
         '<div class="row"><button type="submit" class="btn primary" id="go">בדוק</button>' + (canSpeak ? '<button type="button" class="btn" id="hint">רמז בעברית</button>' : '') + '</div></form></section>',
         true
       );
-      var input = document.getElementById('ans'), fb = document.getElementById('fb');
+      var input = document.getElementById('ans'), fb = document.getElementById('fb'); var mkHint = hintMaker(w.en, true);
       document.getElementById('f').addEventListener('submit', function (e) {
         e.preventDefault();
         if (locked) return;
@@ -1627,7 +1649,7 @@
             locked = true; mark(w, false); fb.className = 'fb no'; fb.innerHTML = 'הכתיב הנכון: ' + en(w.en);
             later(function () { i++; next(); }, 2200);
           } else {
-            fb.className = 'fb no'; fb.innerHTML = sm() ? 'כמעט. הרמז: המשפט מתחיל במילה ' + en(w.en.split(' ')[0]) + ' ויש בו ' + w.en.split(' ').length + ' מילים' : 'כמעט. הרמז: מתחילה באות ' + en(w.en.charAt(0)) + ', ' + w.en.replace(/ /g, '').length + ' אותיות';
+            fb.className = 'fb no'; fb.innerHTML = 'כמעט. ' + mkHint();
           }
         }
       });
@@ -1678,7 +1700,7 @@
         true
       );
       var input = document.getElementById('ans'), fb = document.getElementById('fb');
-      function first() { return w.he.replace(/^[()\s]+/, '').charAt(0); }
+      var mkHint = hintMaker(w.he, false);
       document.getElementById('f').addEventListener('submit', function (e) {
         e.preventDefault();
         if (locked) return;
@@ -1693,10 +1715,10 @@
           if (tries >= 2) {
             locked = true; mark(w, false); fb.className = 'fb no'; fb.textContent = 'התרגום: ' + w.he;
             later(function () { i++; next(); }, 2400);
-          } else { fb.className = 'fb no'; fb.textContent = 'כמעט. רמז: מתחיל באות ' + first(); }
+          } else { fb.className = 'fb no'; fb.textContent = 'כמעט. ' + mkHint(); }
         }
       });
-      document.getElementById('hint').addEventListener('click', function () { fb.className = 'fb'; fb.textContent = 'מתחיל באות ' + first(); });
+      document.getElementById('hint').addEventListener('click', function () { fb.className = 'fb'; fb.innerHTML = mkHint(); });
       input.focus();
     }
     next();
