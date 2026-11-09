@@ -309,17 +309,23 @@
   .steps li { counter-increment: st; display: flex; gap: 10px; align-items: center; line-height: 1.35; }
   .steps li::before { content: counter(st); flex: none; width: 26px; height: 26px; display: grid; place-items: center; background: var(--hi); color: var(--hi-ink); border: 2px solid var(--ink); border-radius: 50%; font-family: var(--hand); font-size: 17px; line-height: 1; }
 
+  .hint { position: absolute; top: 56px; inset-inline-end: 0; z-index: 5; pointer-events: none; white-space: nowrap; background: var(--hi); color: var(--hi-ink); border: 2px solid var(--ink); border-radius: 6px; padding: 4px 10px; font-weight: 800; font-size: 14px; box-shadow: 0 2px 0 var(--ink); animation: hintbob 1.4s ease-in-out infinite; }
+  .hint[hidden] { display: none; }
+  .hint i { position: absolute; top: -9px; inset-inline-end: 14px; width: 14px; height: 14px; background: var(--hi); border-top: 2px solid var(--ink); border-left: 2px solid var(--ink); transform: rotate(45deg); }
+  @keyframes hintbob { 50% { transform: translateY(3px); } }
+  @media (prefers-reduced-motion: reduce) { .hint { animation: none; } }
   @media (prefers-reduced-motion: reduce) { .shake { animation: none; } .bar > span { transition: none; } .spin { animation: none; } }
 </style></head><body>
 
 <div class="wrap">
   <header class="top">
     <h1 class="brand">מילים להכתבה</h1>
-    <div class="tools">
+    <div class="tools" style="position:relative">
       <span class="xp" id="xpWrap" hidden><span id="xp">0</span> נק׳</span>
       <button type="button" class="hbtn" id="gear" aria-label="הגדרות">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
       </button>
+      <div class="hint" id="instHint" hidden aria-hidden="true"><i></i>איך להתקין את האפליקציה</div>
     </div>
   </header>
   <div id="back" hidden><button class="link" id="homeBtn" type="button">חזרה לתפריט</button></div>
@@ -551,7 +557,13 @@
     if (s) speak(s.getAttribute('data-say'));
   });
   document.getElementById('homeBtn').addEventListener('click', backHome);
-  document.getElementById('gear').addEventListener('click', settings);
+  var hintEl = document.getElementById('instHint');
+  function hideHint() { hintEl.hidden = true; document.querySelector('.top').style.marginBottom = ''; if (!store.seenNotices.install) { store.seenNotices.install = true; save(); } }
+  if (!store.seenNotices.install && !isInstalled()) { hintEl.hidden = false; document.querySelector('.top').style.marginBottom = '66px'; }
+  document.getElementById('gear').addEventListener('click', function () {
+    hideHint();
+    if (document.querySelector('.set')) backHome(); else settings();
+  });
 
   /* ---------- Word parsing (pasted lists) ---------- */
   var HEB = /[֐-׿]/, LAT = /[A-Za-z]/;
