@@ -341,6 +341,86 @@
 
   /* Dictations published inside the page, newest first. A new one is added by republishing the page. */
   var LIBRARY = [
+    { id: '2026-11-16', name: 'הכתבת סיכום', words: [
+      { en: 'about', he: 'על / בערך / בקירוב' },
+      { en: 'afraid', he: 'לפחד / מפחד' },
+      { en: 'anything', he: 'הכל / כל דבר / משהו' },
+      { en: 'arrive', he: 'להגיע' },
+      { en: 'catch (a train)', he: 'לתפוס (רכבת)' },
+      { en: 'clever', he: 'חכם' },
+      { en: 'comfortable', he: 'נוח' },
+      { en: 'cost', he: 'עולה / לעלות' },
+      { en: 'Dear ...', he: 'יקר / יקרה ...' },
+      { en: 'decide', he: 'להחליט' },
+      { en: 'directly', he: 'באופן ישיר / ישירות' },
+      { en: 'famous', he: 'מפורסם' },
+      { en: 'get off', he: 'לרדת (מאוטובוס / רכבת)' },
+      { en: 'get on', he: 'לעלות (על אוטובוס / רכבת)' },
+      { en: 'glad', he: 'שמח' },
+      { en: 'hit', he: 'להכות / לפגוע' },
+      { en: 'island', he: 'אי' },
+      { en: 'leave', he: 'לעזוב / לצאת' },
+      { en: 'love', he: 'לאהוב / אהבה' },
+      { en: 'million', he: 'מיליון' },
+      { en: 'mountain', he: 'הר' },
+      { en: 'nature', he: 'טבע / טבעי' },
+      { en: 'order', he: 'להזמין / סדר' },
+      { en: 'pick', he: 'לבחור / להרים / לקטוף' },
+      { en: 'popular', he: 'פופולרי / מקובל' },
+      { en: 'reason', he: 'סיבה' },
+      { en: 'return', he: 'להחזיר / לחזור' },
+      { en: 'saw', he: 'ראה / ראיתי' },
+      { en: 'several', he: 'כמה / מספר / אחדים' },
+      { en: 'still', he: 'עדיין' },
+      { en: 'take (something) away', he: 'לקחת (משהו)' },
+      { en: 'take (something) off', he: 'להוריד (משהו)' },
+      { en: 'take a picture', he: 'לצלם תמונה' },
+      { en: 'take a train', he: 'לקחת / לתפוס רכבת' },
+      { en: 'Take care!', he: 'שמור על עצמך' },
+      { en: 'team', he: 'קבוצה' },
+      { en: 'the cold', he: 'הקור' },
+      { en: 'thousand', he: 'אלף' },
+      { en: 'visitor', he: 'אורח / מבקר' },
+      { en: 'welcome', he: 'ברוך הבא / ברוכים הבאים' },
+      { en: 'a while', he: 'זמן מה' },
+      { en: 'against', he: 'נגד' },
+      { en: 'all the time', he: 'כל הזמן' },
+      { en: 'almost', he: 'כמעט' },
+      { en: 'believe', he: 'להאמין' },
+      { en: 'both', he: 'שניהם' },
+      { en: 'collect', he: 'לאסוף' },
+      { en: 'come home', he: 'לחזור הביתה' },
+      { en: 'competition', he: 'תחרות' },
+      { en: 'could', he: '(היה) יכול' },
+      { en: 'date', he: 'תאריך / פגישה' },
+      { en: 'excellent', he: 'מצוין' },
+      { en: 'feel well', he: 'להרגיש טוב' },
+      { en: 'full', he: 'מלא' },
+      { en: 'get better', he: 'להחלים' },
+      { en: 'get the flu', he: 'לחלות בשפעת' },
+      { en: 'if', he: 'אם' },
+      { en: 'instead', he: 'במקום' },
+      { en: 'invite', he: 'להזמין' },
+      { en: 'keep', he: 'לשמור' },
+      { en: 'kiss', he: 'נשיקה' },
+      { en: 'make a mistake', he: 'לטעות' },
+      { en: 'mean', he: 'להתכוון' },
+      { en: 'medical', he: 'רפואי' },
+      { en: 'message', he: 'הודעה' },
+      { en: 'miss', he: 'לפספס / להתגעגע' },
+      { en: 'much', he: 'הרבה' },
+      { en: 'nurse', he: 'אחות' },
+      { en: 'only', he: 'רק' },
+      { en: 'perfect', he: 'מושלם' },
+      { en: 'pocket', he: 'כיס' },
+      { en: 'really', he: 'באמת / ממש' },
+      { en: 'see', he: 'לראות / לפגוש' },
+      { en: 'should', he: 'צריך / כדאי ש' },
+      { en: 'so', he: 'אז / לכן / כך' },
+      { en: 'sorry', he: 'סליחה / מצטער' },
+      { en: 'tasty', he: 'טעים' },
+      { en: 'tell a story', he: 'לספר סיפור' }
+    ] },
     { id: '2026-11-09', name: 'הכתבה 9.11', words: [
       { en: 'a while', he: 'זמן מה' },
       { en: 'both', he: 'שניהם' },
@@ -869,8 +949,8 @@
     shuf(idx, rnd).slice(0, idx.length ? Math.max(1, Math.round(idx.length * 0.5)) : 0).forEach(function (i) { hide[i] = true; });
     return chars.map(function (ch, i) { return { ch: ch, hide: !!hide[i] }; });
   }
-  function sheetData() {
-    var ws = words(), sig = store.dict.id + '|' + ws.map(function (w) { return w.en + '~' + w.he; }).join('|') + '|' + seedBump;
+  function sheetData(wsIn) {
+    var ws = wsIn || words(), sig = store.dict.id + '|' + ws.map(function (w) { return w.en + '~' + w.he; }).join('|') + '|' + seedBump;
     if (sheetCache.sig === sig) return sheetCache.data;
     var rnd = rngFrom(hashStr(sig)), idxs = ws.map(function (_, i) { return i; });
     var d = {
@@ -909,12 +989,13 @@
     return lines;
   }
   function dot(x, px, py) { x.beginPath(); x.arc(px, py, 13, 0, Math.PI * 2); x.fillStyle = '#ffffff'; x.fill(); x.lineWidth = 4; x.strokeStyle = C_INK; x.stroke(); }
+  var curPart = '';
   function newPage(title, sub) {
     var c = document.createElement('canvas'); c.width = PW; c.height = PH;
     var x = c.getContext('2d');
     x.fillStyle = '#ffffff'; x.fillRect(0, 0, PW, PH);
     x.fillStyle = C_BLUE; rrect(x, PM, 60, PW - 2 * PM, 100, 22); x.fill();
-    txt(x, title, PW / 2, 112, 'center', '#ffffff', '52px ' + F_DISP, 'rtl');
+    txt(x, title + curPart, PW / 2, 112, 'center', '#ffffff', '52px ' + F_DISP, 'rtl');
     var y = 196;
     if (sub) {
       x.font = '600 28px ' + F_UI;
@@ -1170,7 +1251,17 @@
     var token = ++sheetToken, blobs, ctxs;
     try {
       await ensureFonts();
-      ctxs = sh.draw(sheetData());
+      var allW = words();
+      if (sh.id === 'cards' || sh.id === 'board' || allW.length <= 26) { curPart = ''; ctxs = sh.draw(sheetData()); }
+      else {
+        var nch = Math.ceil(allW.length / 20), per = Math.ceil(allW.length / nch), k;
+        ctxs = [];
+        for (k = 0; k < nch; k++) {
+          curPart = ' · חלק ' + (k + 1) + ' מתוך ' + nch;
+          ctxs = ctxs.concat(sh.draw(sheetData(allW.slice(k * per, (k + 1) * per))));
+        }
+        curPart = '';
+      }
       blobs = await Promise.all(ctxs.map(toBlob));
       if (blobs.some(function (b) { return !b; })) throw new Error('blob');
     } catch (e) {
