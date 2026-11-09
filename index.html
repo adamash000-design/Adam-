@@ -300,15 +300,14 @@
   .task .ribbon { position: absolute; top: -13px; inset-inline-end: 14px; background: #c98a00; color: #fff; font-weight: 800; font-size: 14px; padding: 2px 12px; border-radius: 12px; letter-spacing: .5px; }
 
 
-  .install { background: var(--card); border: 2px solid var(--ink); border-radius: 6px; box-shadow: 0 4px 0 var(--ink); padding: 4px 16px 16px; margin: 6px 0 22px; }
-  .install h2 { margin-top: 14px; }
-  .install .note { background: var(--hi); color: var(--hi-ink); border: 2px dashed var(--ink); border-radius: 4px; padding: 8px 10px; font-weight: 600; margin: 8px 0 12px; }
-  .how { border-top: 1px dashed var(--rule); padding: 6px 0; }
-  .how summary { cursor: pointer; font-weight: 800; min-height: 44px; display: flex; align-items: center; gap: 6px; }
-  .how summary small { font-weight: 600; color: var(--ink-soft); }
-  .steps { list-style: none; counter-reset: st; margin: 4px 0 8px; padding: 0; display: grid; gap: 10px; }
-  .steps li { counter-increment: st; display: flex; gap: 10px; align-items: flex-start; line-height: 1.4; }
-  .steps li::before { content: counter(st); flex: none; width: 30px; height: 30px; display: grid; place-items: center; background: var(--hi); color: var(--hi-ink); border: 2px solid var(--ink); border-radius: 50%; font-family: var(--hand); font-size: 20px; line-height: 1; }
+  .install { background: var(--card); border: 2px solid var(--ink); border-radius: 6px; box-shadow: 0 3px 0 var(--ink); padding: 2px 16px 14px; margin: 4px 0 18px; }
+  .install h2 { margin: 12px 0 10px; }
+  .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; }
+  .segb { font: inherit; font-weight: 800; min-height: 44px; border: 2px solid var(--ink); border-radius: 4px; background: var(--paper); color: var(--ink); cursor: pointer; }
+  .segb[aria-selected="true"] { background: var(--hi); color: var(--hi-ink); box-shadow: 0 2px 0 var(--ink); }
+  .steps { list-style: none; counter-reset: st; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .steps li { counter-increment: st; display: flex; gap: 10px; align-items: center; line-height: 1.35; }
+  .steps li::before { content: counter(st); flex: none; width: 26px; height: 26px; display: grid; place-items: center; background: var(--hi); color: var(--hi-ink); border: 2px solid var(--ink); border-radius: 50%; font-family: var(--hand); font-size: 17px; line-height: 1; }
 
   @media (prefers-reduced-motion: reduce) { .shake { animation: none; } .bar > span { transition: none; } .spin { animation: none; } }
 </style></head><body>
@@ -858,61 +857,41 @@
     }
   }
 
-  /* ---------- Add to home screen + share the link ---------- */
-  var ARTIFACT_URL = 'https://claude.ai/artifact/3WBBcQXbwVXpqr5AdievaH';
-  var deferredInstall = null;
-  window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferredInstall = e; });
+  /* ---------- Add to home screen ---------- */
+  function isInstalled() {
+    try { return !!(window.navigator.standalone || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)); } catch (e) { return false; }
+  }
   function platform() {
     var ua = navigator.userAgent || '';
     if (/iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) return 'ios';
     return /Android/i.test(ua) ? 'android' : 'desktop';
   }
-  function isFramed() { try { return window.self !== window.top; } catch (e) { return true; } }
-  function siteUrl() { return isFramed() ? ARTIFACT_URL : String(location.href).split('#')[0]; }
+  var HOW = [
+    { id: 'ios', name: 'אפל', steps: ['פתחו את האתר ב-Safari.', 'לחצו על כפתור השיתוף: ריבוע עם חץ למעלה.', 'בחרו "הוסף למסך הבית".', 'לחצו "הוסף".'] },
+    { id: 'android', name: 'אנדרואיד', steps: ['פתחו את האתר ב-Chrome.', 'לחצו על שלוש הנקודות ⋮ למעלה.', 'בחרו "התקנת אפליקציה" או "הוספה למסך הבית".', 'אשרו.'] },
+    { id: 'desktop', name: 'מחשב', steps: ['ב-Chrome או Edge: לחצו על סמל ההתקנה בשורת הכתובת.', 'אם אין סמל: תפריט ⋮ ואז "התקנת דף כאפליקציה".', 'ב-Safari במק: "קובץ" ואז "הוסף ל-Dock".', 'או שמרו במועדפים עם Ctrl+D (במק ⌘+D).'] }
+  ];
+  function installSteps(id) {
+    var h = HOW.filter(function (x) { return x.id === id; })[0];
+    return '<ol class="steps">' + h.steps.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ol>';
+  }
   function installSection() {
+    if (isInstalled()) return '';
     var pf = platform();
-    var HOW = [
-      { id: 'ios', name: 'אייפון ואייפד', steps: ['פתחו את האתר ב-Safari, לא מתוך אפליקציה אחרת.', 'לחצו על כפתור השיתוף: ריבוע עם חץ שמצביע למעלה.', 'גללו למטה ובחרו "הוסף למסך הבית".', 'לחצו "הוסף" בפינה. הסמל יופיע על מסך הבית.'] },
-      { id: 'android', name: 'אנדרואיד', steps: ['פתחו את האתר ב-Chrome.', 'לחצו על שלוש הנקודות ⋮ בפינה העליונה.', 'בחרו "התקנת אפליקציה" או "הוספה למסך הבית".', 'אשרו. הסמל יופיע על מסך הבית. ב-Samsung Internet: תפריט, "הוסף דף אל", "מסך הבית".'] },
-      { id: 'desktop', name: 'מחשב', steps: ['ב-Chrome או Edge: לחצו על סמל ההתקנה בקצה שורת הכתובת, מסך קטן עם חץ.', 'אם אין סמל: תפריט ⋮, "שמירה והעברה", "התקנת דף כאפליקציה". ב-Edge: תפריט, "אפליקציות", "התקן אתר זה כאפליקציה".', 'ב-Safari במק: תפריט "קובץ", "הוסף ל-Dock".', 'בכל דפדפן אפשר גם ללחוץ Ctrl+D (במק ⌘+D) כדי לשמור במועדפים.'] }
-    ];
-    var blocks = HOW.map(function (h) {
-      return '<details class="how"' + (h.id === pf ? ' open' : '') + '><summary>' + esc(h.name) + (h.id === pf ? ' <small>(המכשיר הזה)</small>' : '') + '</summary><ol class="steps">' +
-        h.steps.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ol></details>';
-    }).join('');
     return '<div class="install"><h2>הוסף למסך הבית</h2>' +
-      '<p class="sub">ככה האפליקציה נמצאת על המסך כמו אפליקציה רגילה, בלי לחפש את הקישור.</p>' +
-      (isFramed() ? '<p class="note">עכשיו האתר פתוח בתוך Claude. כדי להוסיף אותו למסך הבית, פתחו את הקישור בדפדפן (Safari או Chrome) ואז בצעו את הצעדים.</p>' : '') +
-      '<div class="stack"><button type="button" class="btn primary" id="shareLink">שלח את הקישור לחבר או לחברה</button>' +
-      '<button type="button" class="btn" id="instNow" hidden>התקן עכשיו</button></div>' +
-      '<div class="msg" id="shareMsg" role="status"></div><div id="linkHost"></div>' + blocks +
-      '<p class="sub">חשוב: הנקודות נשמרות בנפרד לכל מקום שבו פותחים את האתר. כדאי להוסיף למסך הבית לפני שמתחילים לצבור נקודות.</p></div>';
+      '<div class="seg" role="tablist" aria-label="סוג מכשיר">' +
+      HOW.map(function (h) { return '<button type="button" role="tab" class="segb" data-pf="' + h.id + '" aria-selected="' + (h.id === pf) + '">' + esc(h.name) + '</button>'; }).join('') +
+      '</div><div id="instBody">' + installSteps(pf) + '</div></div>';
   }
   function bindInstall() {
-    var sb = document.getElementById('shareLink'), msg = document.getElementById('shareMsg'), host = document.getElementById('linkHost'), inst = document.getElementById('instNow');
-    if (!sb) return;
-    function say(t, c) { msg.className = 'msg ' + (c || ''); msg.textContent = t; }
-    function manual(url) {
-      host.innerHTML = '<label class="field" for="linkBox"><span>סמנו והעתיקו את הקישור</span></label><input class="fi" id="linkBox" type="text" readonly dir="ltr">';
-      var box = document.getElementById('linkBox'); box.value = url; box.focus(); box.select(); say('העתיקו את הקישור ושלחו אותו.', '');
-    }
-    function copy(url) {
-      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(function () { host.innerHTML = ''; say('הקישור הועתק. אפשר להדביק בהודעה.', 'ok'); }, function () { manual(url); });
-      else manual(url);
-    }
-    sb.addEventListener('click', function () {
-      var url = siteUrl();
-      if (navigator.share) {
-        navigator.share({ title: 'מילים להכתבה', text: 'אפליקציה לתרגול הכתבות באנגלית', url: url }).catch(function (e) { if (!e || e.name !== 'AbortError') copy(url); });
-      } else copy(url);
-    });
-    if (deferredInstall && !isFramed()) {
-      inst.hidden = false;
-      inst.addEventListener('click', function () {
-        deferredInstall.prompt();
-        deferredInstall.userChoice.then(function () { deferredInstall = null; inst.hidden = true; }, function () {});
+    var body = document.getElementById('instBody');
+    if (!body) return;
+    [].forEach.call(document.querySelectorAll('.segb'), function (b) {
+      b.addEventListener('click', function () {
+        [].forEach.call(document.querySelectorAll('.segb'), function (x) { x.setAttribute('aria-selected', x === b ? 'true' : 'false'); });
+        body.innerHTML = installSteps(b.getAttribute('data-pf'));
       });
-    }
+    });
   }
 
   /* ---------- Practice sheets: drawn on canvas, saved or shared as PNG ---------- */
